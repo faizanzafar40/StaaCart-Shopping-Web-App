@@ -1,3 +1,3 @@
-# StaaCart-Web-Project
+# StaaCart
 
-Worked on a responsive website of an online shopping portal built using HTML, CSS, JavaScript and PHP with MySQL for database management.
+A fully responsive web app where users can purchase and personalize clothing items while keeping up with the latest trends in the clothing and fashion industry.
