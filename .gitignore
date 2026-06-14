@@ -1,0 +1,23 @@
+# Local configuration / secrets
+.env
+config.php
+
+# PHP dependencies (if I later add Composer)
+/vendor/
+composer.lock
+
+# Logs and runtime cruft
+*.log
+error_log
+.htaccess.local
+
+# Editor / IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
