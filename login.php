@@ -33,13 +33,14 @@
 		}
 		
 		
-			$password = hash('sha256', $pass); // password hashing using SHA256
-		
-			$res=mysql_query("SELECT userId, userName, userPass FROM users WHERE userEmail='$email'");
-			$row=mysql_fetch_array($res);
-			$count = mysql_num_rows($res); // if uname/pass correct it returns must be 1 row
-			echo $count;
-			if( $count == 1 && $row['userPass']==$password ) {
+			// Parameterised lookup so the email can never break out of the query.
+			$stmt = $conn->prepare("SELECT userId, userName, userPass FROM users WHERE userEmail = ?");
+			$stmt->bind_param("s", $email);
+			$stmt->execute();
+			$result = $stmt->get_result();
+			$row = $result->fetch_assoc();
+			$count = $result->num_rows; // a correct email matches exactly one row
+			if( $count == 1 && password_verify($pass, $row['userPass']) ) {
 				$_SESSION['user'] = $row['userId'];
 				header("Location: index.php");
 			} else {
@@ -57,7 +58,7 @@
 <!-- for-mobile-apps -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="icon" type="image/png" href="../images/fav.png" sizes="32x32">
+<link rel="icon" type="image/png" href="images/fav.png" sizes="32x32">
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
 		function hideURLbar(){ window.scrollTo(0,1); } </script>
 <!-- //for-mobile-apps -->
@@ -122,14 +123,14 @@
 						
 						<li>
 						<div>
-						<form id="frmSearch" method="get" action="default.php">
+						<form id="frmSearch" method="get" action="index.php">
 		<input class="glyphicon glyphicon-search" type="text"  id="txtSearch" type="text" name="search" placeholder="Search..." " />
 		
 		</form>
 
 			<script type="text/javascript">
     document.getElementById('frmSearch').onsubmit = function() {
-        window.location = 'http://www.google.com/search?q=site:faizanzafar95.wordpress.com' + document.getElementById('txtSearch').value;
+        window.location = 'https://www.google.com/search?q=site:faizanzafar95.wordpress.com' + document.getElementById('txtSearch').value;
         return false;
     }
 			</script>	

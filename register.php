@@ -37,9 +37,12 @@
 			$error = true;
 			$emailError = "Please enter valid email address.";
 		} else {
-			$query = "SELECT userEmail FROM users WHERE userEmail='$email'";
-			$result = mysql_query($query);
-			$count = mysql_num_rows($result);
+			// Reject the sign-up if this email is already registered.
+			$stmt = $conn->prepare("SELECT userEmail FROM users WHERE userEmail = ?");
+			$stmt->bind_param("s", $email);
+			$stmt->execute();
+			$count = $stmt->get_result()->num_rows;
+			$stmt->close();
 			if($count!=0){
 				$error = true;
 				$emailError = "Provided Email is already in use.";
@@ -53,14 +56,16 @@
 			$passError = "Password must have atleast 6 characters.";
 		}
 		
-		// password encrypt using SHA256();
-		$password = hash('sha256', $pass);
+		// Store a salted bcrypt hash; password_hash() generates the salt for me.
+		$password = password_hash($pass, PASSWORD_DEFAULT);
 		
 		if( !$error ) {
 			
-			$query = "INSERT INTO users(userName,userEmail,userPass) VALUES('$name','$email','$password')";
-			$res = mysql_query($query);
-				
+			$stmt = $conn->prepare("INSERT INTO users(userName, userEmail, userPass) VALUES(?, ?, ?)");
+			$stmt->bind_param("sss", $name, $email, $password);
+			$res = $stmt->execute();
+			$stmt->close();
+
 			if ($res) {
 				$errTyp = "success";
 				$errMSG = "Successfully registered, you may login now";
@@ -86,7 +91,7 @@
 <!-- for-mobile-apps -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="icon" type="image/png" href="../images/fav.png" sizes="32x32">
+<link rel="icon" type="image/png" href="images/fav.png" sizes="32x32">
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
 		function hideURLbar(){ window.scrollTo(0,1); } </script>
 <!-- //for-mobile-apps -->
@@ -151,14 +156,14 @@
 						
 						<li>
 						<div>
-						<form id="frmSearch" method="get" action="default.php">
+						<form id="frmSearch" method="get" action="index.php">
 		<input class="glyphicon glyphicon-search" type="text"  id="txtSearch" type="text" name="search" placeholder="Search..." " />
 		
 		</form>
 
 			<script type="text/javascript">
     document.getElementById('frmSearch').onsubmit = function() {
-        window.location = 'http://www.google.com/search?q=site:faizanzafar95.wordpress.com' + document.getElementById('txtSearch').value;
+        window.location = 'https://www.google.com/search?q=site:faizanzafar95.wordpress.com' + document.getElementById('txtSearch').value;
         return false;
     }
 			</script>	

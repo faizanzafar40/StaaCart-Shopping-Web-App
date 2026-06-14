@@ -3,8 +3,14 @@
 	session_start();
 	require_once 'dbconnect.php';
 	if( isset($_SESSION['user']) ) {
-	$res=mysql_query("SELECT * FROM users WHERE userId=".$_SESSION['user']);
-	$userRow=mysql_fetch_array($res);}
+		// Look up the signed-in user so the header can greet them by email.
+		$uid = (int) $_SESSION['user'];
+		$stmt = $conn->prepare("SELECT * FROM users WHERE userId = ?");
+		$stmt->bind_param("i", $uid);
+		$stmt->execute();
+		$userRow = $stmt->get_result()->fetch_assoc();
+		$stmt->close();
+	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -13,7 +19,7 @@
 <!-- for-mobile-apps -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="icon" type="image/png" href="../images/fav.png" sizes="32x32">
+<link rel="icon" type="image/png" href="images/fav.png" sizes="32x32">
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
 		function hideURLbar(){ window.scrollTo(0,1); } </script>
 <!-- //for-mobile-apps -->
@@ -78,14 +84,14 @@
 						
 						<li>
 						<div>
-						<form id="frmSearch" method="get" action="default.php">
+						<form id="frmSearch" method="get" action="index.php">
 		<input class="glyphicon glyphicon-search" type="text"  id="txtSearch" type="text" name="search" placeholder="Search..." " />
 		
 		</form>
 
 			<script type="text/javascript">
     document.getElementById('frmSearch').onsubmit = function() {
-        window.location = 'http://www.google.com/search?q=site:faizanzafar95.wordpress.com' + document.getElementById('txtSearch').value;
+        window.location = 'https://www.google.com/search?q=site:faizanzafar95.wordpress.com' + document.getElementById('txtSearch').value;
         return false;
     }
 			</script>	
